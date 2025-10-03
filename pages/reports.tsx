@@ -32,7 +32,7 @@ const Reports = () => {
       const { data } = await authClient.getSession();
       if (!data?.user) {
         router.push('/login');
-      } else if (data.user.role !== 'ADMIN') {
+      } else if ((data.user as any).role !== 'ADMIN') {
         router.push('/');
       } else {
         setUser(data.user);
