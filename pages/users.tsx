@@ -41,7 +41,7 @@ const Users = () => {
       const { data } = await authClient.getSession();
       if (!data?.user) {
         router.push('/login');
-      } else if (data.user.role !== 'ADMIN') {
+      } else if ('role' in data.user && data.user.role !== 'ADMIN') {
         router.push('/');
       } else {
         setUser(data.user);
