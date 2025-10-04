@@ -34,8 +34,8 @@ const Login = () => {
             Continuar con GitHub
           </Button>
           <p className='text-xs text-center text-gray-500 mt-4'>
-            Al iniciar sesión, se le asignará automáticamente el rol de
-            Administrador
+            Al iniciar sesión por primera vez, se le asignará automáticamente el
+            rol de Administrador
           </p>
         </CardContent>
       </Card>

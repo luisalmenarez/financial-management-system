@@ -9,7 +9,8 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { useRouter } from 'next/router';
-import { ArrowLeft, Download } from 'lucide-react';
+import { Download } from 'lucide-react';
+import { Layout } from '@/components/ui/layout';
 import {
   BarChart,
   Bar,
@@ -88,100 +89,96 @@ const Reports = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50'>
-      <header className='bg-white shadow'>
-        <div className='max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center'>
-          <div className='flex items-center gap-4'>
-            <Button variant='outline' onClick={() => router.push('/')}>
-              <ArrowLeft className='h-4 w-4 mr-2' />
-              Volver
-            </Button>
-            <h1 className='text-2xl font-bold text-gray-900'>
+    <Layout user={user} showNavMenu={true}>
+      {/* Main Content */}
+      <main>
+        <div className='mt-12 lg:mt-0'>
+          {/* Header con título y botón exportar */}
+          <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6'>
+            <h2 className='text-2xl font-bold text-gray-900'>
               Reportes Financieros
-            </h1>
+            </h2>
+            <Button onClick={handleExport}>
+              <Download className='h-4 w-4 mr-2' />
+              Exportar CSV
+            </Button>
           </div>
-          <Button onClick={handleExport}>
-            <Download className='h-4 w-4 mr-2' />
-            Exportar CSV
-          </Button>
+
+          {/* Resumen - Cards */}
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
+            <Card>
+              <CardHeader>
+                <CardTitle className='text-sm font-medium text-gray-600'>
+                  Total Ingresos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className='text-3xl font-bold text-green-600'>
+                  ${reportData?.totalIncome?.toFixed(2) || '0.00'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className='text-sm font-medium text-gray-600'>
+                  Total Egresos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className='text-3xl font-bold text-red-600'>
+                  ${reportData?.totalExpense?.toFixed(2) || '0.00'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className='text-sm font-medium text-gray-600'>
+                  Saldo Actual
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p
+                  className={`text-3xl font-bold ${
+                    (reportData?.balance || 0) >= 0
+                      ? 'text-blue-600'
+                      : 'text-red-600'
+                  }`}
+                >
+                  ${reportData?.balance?.toFixed(2) || '0.00'}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Gráfico */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Movimientos por Mes</CardTitle>
+              <CardDescription>
+                Visualización de ingresos y egresos mensuales
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className='h-96'>
+                <ResponsiveContainer width='100%' height='100%'>
+                  <BarChart data={reportData?.monthlyData || []}>
+                    <CartesianGrid strokeDasharray='3 3' />
+                    <XAxis dataKey='month' />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey='income' fill='#10b981' name='Ingresos' />
+                    <Bar dataKey='expense' fill='#ef4444' name='Egresos' />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </header>
-
-      <main className='max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8'>
-        {/* Resumen */}
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-sm font-medium text-gray-600'>
-                Total Ingresos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className='text-3xl font-bold text-green-600'>
-                ${reportData?.totalIncome?.toFixed(2) || '0.00'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-sm font-medium text-gray-600'>
-                Total Egresos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className='text-3xl font-bold text-red-600'>
-                ${reportData?.totalExpense?.toFixed(2) || '0.00'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-sm font-medium text-gray-600'>
-                Saldo Actual
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p
-                className={`text-3xl font-bold ${
-                  (reportData?.balance || 0) >= 0
-                    ? 'text-blue-600'
-                    : 'text-red-600'
-                }`}
-              >
-                ${reportData?.balance?.toFixed(2) || '0.00'}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Gráfico */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Movimientos por Mes</CardTitle>
-            <CardDescription>
-              Visualización de ingresos y egresos mensuales
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className='h-96'>
-              <ResponsiveContainer width='100%' height='100%'>
-                <BarChart data={reportData?.monthlyData || []}>
-                  <CartesianGrid strokeDasharray='3 3' />
-                  <XAxis dataKey='month' />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey='income' fill='#10b981' name='Ingresos' />
-                  <Bar dataKey='expense' fill='#ef4444' name='Egresos' />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
       </main>
-    </div>
+    </Layout>
   );
 };
 

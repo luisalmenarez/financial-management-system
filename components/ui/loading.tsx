@@ -1,16 +1,25 @@
 import { PropagateLoader } from 'react-spinners';
+import { cn } from '@/lib/utils';
 
 type LoadingProps = {
   loading: boolean;
+  className?: string;
+  size?: number;
+  color?: string;
 };
 
-export const Loading = ({ loading }: LoadingProps) => {
+export const Loading = ({
+  loading,
+  className,
+  size = 25,
+  color = '#0f172a',
+}: LoadingProps) => {
   return (
-    <div className='flex justify-center items-center h-screen'>
+    <div className={cn('flex justify-center items-center h-screen', className)}>
       <PropagateLoader
-        color={'#0f172a'}
+        color={color}
         loading={loading}
-        size={25}
+        size={size}
         speedMultiplier={1}
       />
     </div>

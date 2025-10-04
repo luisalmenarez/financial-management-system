@@ -23,15 +23,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/router';
-import { Plus, Pencil, Trash, Menu, X, Home, LogOut } from 'lucide-react';
+import { Plus, Pencil, Trash } from 'lucide-react';
+import { Layout } from '@/components/ui/layout';
 
 const Transactions = () => {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [loadingTransactions, setloadingTransactions] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
     concept: '',
     amount: '',
@@ -56,6 +57,7 @@ const Transactions = () => {
   }, [router]);
 
   const fetchTransactions = async () => {
+    setloadingTransactions(true);
     try {
       const response = await fetch('/api/transactions', {
         credentials: 'include',
@@ -66,6 +68,8 @@ const Transactions = () => {
       }
     } catch (error) {
       console.error('Error al obtener transacciones:', error);
+    } finally {
+      setloadingTransactions(false);
     }
   };
 
@@ -164,11 +168,6 @@ const Transactions = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    await authClient.signOut();
-    router.push('/login');
-  };
-
   if (loading) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
@@ -180,239 +179,191 @@ const Transactions = () => {
   const isAdmin = user?.role === 'ADMIN';
 
   return (
-    <div className='min-h-screen bg-gray-50'>
-      {/* Botón Hamburguesa - Solo Mobile */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className='lg:hidden fixed top-2 left-4 z-50 bg-white p-2 rounded-md shadow-md'
-      >
-        {sidebarOpen ? (
-          <X className='h-6 w-6 text-gray-900' />
-        ) : (
-          <Menu className='h-6 w-6 text-gray-900' />
-        )}
-      </button>
-
-      {/* Overlay para cerrar sidebar en mobile */}
-      {sidebarOpen && (
-        <div
-          className='lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30'
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar/Aside */}
-      <aside
-        className={`
-          fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-40
-          transition-transform duration-300 ease-in-out
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0
-        `}
-      >
-        <div className='px-4 py-12 flex flex-col justify-between h-full'>
-          <div>
-            <h1 className='text-2xl text-center font-bold text-gray-900 mb-8'>
-              Sistema de Gestión Financiera
-            </h1>
-
-            {/* Menú de navegación */}
-            <nav className='space-y-2'>
-              <button
-                onClick={() => {
-                  router.push('/');
-                  setSidebarOpen(false);
-                }}
-                className='w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors'
-              >
-                <Home className='h-5 w-5' />
-                <span>Inicio</span>
-              </button>
-            </nav>
-          </div>
-
-          <div className='flex flex-col items-center gap-4'>
-            <div className='text-center'>
-              <p className='text-sm font-medium text-gray-900'>{user?.name}</p>
-              <p className='text-xs text-gray-500'>({user?.role})</p>
-            </div>
-            <Button
-              variant='outline'
-              onClick={handleSignOut}
-              className='w-full'
-            >
-              <LogOut className='h-4 w-4 mr-2' />
-              Cerrar Sesión
-            </Button>
-          </div>
-        </div>
-      </aside>
-
+    <Layout user={user} showNavMenu={true}>
       {/* Main Content */}
-      <main className='lg:ml-64 min-h-screen p-6 lg:p-10'>
-        <div className='mt-12 lg:mt-0'>
-          <h2 className='text-2xl font-bold text-gray-900 mb-6'>
-            Ingresos y Egresos
-          </h2>
-
-          <Card>
-            <CardHeader className='flex flex-col sm:flex-row sm:items-center justify-between'>
-              <CardTitle>Lista de Transacciones</CardTitle>
-              {isAdmin && (
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className='h-4 w-4 mr-2' />
-                      Nueva Transacción
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <form onSubmit={handleSubmit}>
-                      <DialogHeader>
-                        <DialogTitle>Nueva Transacción</DialogTitle>
-                        <DialogDescription>
-                          Agregue un nuevo ingreso o egreso al sistema
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className='grid gap-4 py-4'>
-                        <div className='grid gap-2'>
-                          <Label htmlFor='concept'>Concepto</Label>
-                          <Input
-                            id='concept'
-                            value={formData.concept}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                concept: e.target.value,
-                              })
-                            }
-                            required
-                          />
-                        </div>
-                        <div className='grid gap-2'>
-                          <Label htmlFor='amount'>Monto</Label>
-                          <Input
-                            id='amount'
-                            type='number'
-                            step='0.01'
-                            value={formData.amount}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                amount: e.target.value,
-                              })
-                            }
-                            required
-                          />
-                        </div>
-                        <div className='grid gap-2'>
-                          <Label htmlFor='date'>Fecha</Label>
-                          <Input
-                            id='date'
-                            type='date'
-                            value={formData.date}
-                            onChange={(e) =>
-                              setFormData({ ...formData, date: e.target.value })
-                            }
-                            required
-                          />
-                        </div>
-                        <div className='grid gap-2'>
-                          <Label htmlFor='type'>Tipo</Label>
-                          <select
-                            id='type'
-                            className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
-                            value={formData.type}
-                            onChange={(e) =>
-                              setFormData({ ...formData, type: e.target.value })
-                            }
-                          >
-                            <option value='INCOME'>Ingreso</option>
-                            <option value='EXPENSE'>Egreso</option>
-                          </select>
-                        </div>
+      <main>
+        <h2 className='text-2xl font-bold text-gray-900 mb-6'>
+          Ingresos y Egresos
+        </h2>
+        <Card>
+          <CardHeader className='flex flex-col sm:flex-row sm:items-center justify-between'>
+            <CardTitle>Lista de Transacciones</CardTitle>
+            {isAdmin && (
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className='h-4 w-4 mr-2' />
+                    Nueva Transacción
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <form onSubmit={handleSubmit}>
+                    <DialogHeader>
+                      <DialogTitle>Nueva Transacción</DialogTitle>
+                      <DialogDescription>
+                        Agregue un nuevo ingreso o egreso al sistema
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className='grid gap-4 py-4'>
+                      <div className='grid gap-2'>
+                        <Label htmlFor='concept'>Concepto</Label>
+                        <Input
+                          id='concept'
+                          value={formData.concept}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              concept: e.target.value,
+                            })
+                          }
+                          required
+                        />
                       </div>
-                      <DialogFooter>
-                        <Button type='submit'>Guardar</Button>
-                      </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className='overflow-x-auto'>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Concepto</TableHead>
-                      <TableHead>Monto</TableHead>
-                      <TableHead>Fecha</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Usuario</TableHead>
-                      {isAdmin && <TableHead>Acciones</TableHead>}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transactions.map((transaction) => (
-                      <TableRow key={transaction.id}>
-                        <TableCell>{transaction.concept}</TableCell>
-                        <TableCell className='font-medium'>
-                          ${transaction.amount.toFixed(2)}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(transaction.date).toLocaleDateString(
-                            'es-CO',
-                            {
-                              timeZone: 'UTC',
-                            }
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs ${
-                              transaction.type === 'INCOME'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                            }`}
-                          >
-                            {transaction.type === 'INCOME'
-                              ? 'Ingreso'
-                              : 'Egreso'}
-                          </span>
-                        </TableCell>
-                        <TableCell>{transaction.user.name}</TableCell>
-                        {isAdmin && (
-                          <TableCell>
-                            <div className='flex gap-2'>
-                              <button
-                                onClick={() => handleEdit(transaction)}
-                                className='flex hover:bg-slate-200 w-10 h-10 rounded-full justify-center items-center transition-colors'
-                              >
-                                <Pencil className='h-4 w-4' />
-                              </button>
-                              <button
-                                onClick={() => handleDelete(transaction.id)}
-                                className='flex hover:bg-red-100 w-10 h-10 rounded-full justify-center items-center transition-colors'
-                              >
-                                <Trash className='h-4 w-4 text-red-500' />
-                              </button>
-                            </div>
-                          </TableCell>
+                      <div className='grid gap-2'>
+                        <Label htmlFor='amount'>Monto</Label>
+                        <Input
+                          id='amount'
+                          type='number'
+                          step='0.01'
+                          value={formData.amount}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              amount: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+                      <div className='grid gap-2'>
+                        <Label htmlFor='date'>Fecha</Label>
+                        <Input
+                          id='date'
+                          type='date'
+                          value={formData.date}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              date: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+                      <div className='grid gap-2'>
+                        <Label htmlFor='type'>Tipo</Label>
+                        <select
+                          id='type'
+                          className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                          value={formData.type}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              type: e.target.value,
+                            })
+                          }
+                        >
+                          <option value='INCOME'>Ingreso</option>
+                          <option value='EXPENSE'>Egreso</option>
+                        </select>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type='submit'>Guardar</Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
+          </CardHeader>
+          <CardContent>
+            <div className='overflow-x-auto'>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Concepto</TableHead>
+                    <TableHead>Monto</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Usuario</TableHead>
+                    {isAdmin && <TableHead>Acciones</TableHead>}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {transactions.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell>{transaction.concept}</TableCell>
+                      <TableCell className='font-medium'>
+                        ${transaction.amount.toFixed(2)}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(transaction.date).toLocaleDateString(
+                          'es-CO',
+                          {
+                            timeZone: 'UTC',
+                          }
                         )}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              {transactions.length === 0 && (
-                <p className='text-center text-gray-500 py-4'>
-                  No hay transacciones registradas
-                </p>
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            transaction.type === 'INCOME'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
+                        >
+                          {transaction.type === 'INCOME' ? 'Ingreso' : 'Egreso'}
+                        </span>
+                      </TableCell>
+                      <TableCell>{transaction.user.name}</TableCell>
+                      {isAdmin && (
+                        <TableCell className='flex gap-2'>
+                          <Button
+                            onClick={() => handleEdit(transaction)}
+                            size='sm'
+                            variant='edit'
+                          >
+                            <Pencil className='size-4' />
+                          </Button>
+                          <Button
+                            onClick={() => handleDelete(transaction.id)}
+                            size='sm'
+                            variant='delete'
+                          >
+                            <Trash className='size-4 text-red-500' />
+                          </Button>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            <CardContent>
+              {loadingTransactions && transactions.length === 0 ? (
+                <>
+                  <p className='mt-4'>Cargando Transacciones</p>
+                  <Loading
+                    className='h-full'
+                    loading={loadingTransactions}
+                    size={10}
+                  />
+                </>
+              ) : (
+                <div>
+                  {transactions.length === 0 && (
+                    <p className='text-center text-gray-500 py-4'>
+                      <p className='text-center text-gray-500 py-4'>
+                        No hay transacciones registradas
+                      </p>
+                    </p>
+                  )}
+                </div>
               )}
             </CardContent>
-          </Card>
-        </div>
+          </CardContent>
+        </Card>
       </main>
 
       {/* Dialog de EDITAR */}
@@ -497,7 +448,7 @@ const Transactions = () => {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+    </Layout>
   );
 };
 
