@@ -2,7 +2,9 @@ import { Html, Head, Main, NextScript } from 'next/document';
 
 const Document = () => (
   <Html lang='en'>
-    <Head />
+    <Head>
+      <title>Sistema de Gestión Financiera</title>
+    </Head>
     <body>
       <Main />
       <NextScript />
