@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import 'swagger-ui-react/swagger-ui.css';
+import { Loading } from '@/components/ui/loading';
 
 const SwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false });
 
@@ -17,7 +18,7 @@ export default function ApiDocs() {
   if (!spec) {
     return (
       <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-        <p>Cargando documentación...</p>
+        <Loading loading={true} size={10} />
       </div>
     );
   }
