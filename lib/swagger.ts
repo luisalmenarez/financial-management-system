@@ -59,7 +59,7 @@ const options: swaggerJsdoc.Options = {
       },
     ],
   },
-  apis: ['./pages/api/**/*.ts'],
+  apis: ['./pages/api/**/*.ts', './.next/server/pages/api/**/*.js'],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);

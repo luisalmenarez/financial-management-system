@@ -1,13 +1,15 @@
 import dynamic from 'next/dynamic';
 import 'swagger-ui-react/swagger-ui.css';
+import { GetServerSideProps } from 'next';
+import { swaggerSpec } from '@/lib/swagger';
 
 const SwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false });
 
-/**
- * Página de documentación de la API
- * Renderiza la interfaz de Swagger UI con la especificación OpenAPI
- */
-export default function ApiDocs() {
+interface ApiDocsProps {
+  spec: any;
+}
+
+export default function ApiDocs({ spec }: ApiDocsProps) {
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='bg-white shadow'>
@@ -21,8 +23,16 @@ export default function ApiDocs() {
         </div>
       </div>
       <div className='max-w-7xl mx-auto'>
-        <SwaggerUI url='/api/docs' />
+        <SwaggerUI spec={spec} />
       </div>
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  return {
+    props: {
+      spec: swaggerSpec,
+    },
+  };
+};
