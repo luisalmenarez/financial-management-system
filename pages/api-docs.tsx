@@ -1,15 +1,27 @@
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import 'swagger-ui-react/swagger-ui.css';
-import { GetServerSideProps } from 'next';
-import { swaggerSpec } from '@/lib/swagger';
 
 const SwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false });
 
-interface ApiDocsProps {
-  spec: any;
-}
+export default function ApiDocs() {
+  const [spec, setSpec] = useState(null);
 
-export default function ApiDocs({ spec }: ApiDocsProps) {
+  useEffect(() => {
+    fetch('/api/docs')
+      .then((res) => res.json())
+      .then((data) => setSpec(data))
+      .catch((err) => console.error('Error cargando spec:', err));
+  }, []);
+
+  if (!spec) {
+    return (
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <p>Cargando documentación...</p>
+      </div>
+    );
+  }
+
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='bg-white shadow'>
@@ -28,11 +40,3 @@ export default function ApiDocs({ spec }: ApiDocsProps) {
     </div>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  return {
-    props: {
-      spec: swaggerSpec,
-    },
-  };
-};
