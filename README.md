@@ -4,7 +4,7 @@ Sistema fullstack de gestión financiera con autenticación, control de acceso b
 
 ## 🚀 Demo
 
-- **URL de producción:** [Próximamente en Vercel]
+- **URL de producción:** https://financial-management-system-bgzj.vercel.app/
 - **Documentación API:** `/api-docs` - Interfaz Swagger UI
 - **Especificación OpenAPI:** `/api/docs` - JSON spec
 
@@ -47,7 +47,6 @@ Sistema completo de gestión de ingresos y egresos que permite a los administrad
 ### Testing
 
 - **Framework:** Jest
-- **Testing Library:** React Testing Library
 
 ## 📦 Instalación y Configuración
 
@@ -295,3 +294,6 @@ rm -rf .next node_modules
 npm install
 npm run build
 ```
+
+### NOTA
+- Cuenta con diseño responsive, echarle un ojo ;)
