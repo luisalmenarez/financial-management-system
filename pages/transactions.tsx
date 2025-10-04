@@ -308,26 +308,33 @@ const Transactions = () => {
                     </TableCell>
                     <TableCell>{transaction.user.name}</TableCell>
                     <TableCell className='flex justify-start gap-6'>
-                      <div className='flex hover:bg-slate-200 w-10 h-10 rounded-full justify-center items-center'>
-                        {/* Button pencil edit  */}
-                        <div className='flex hover:bg-slate-200 w-10 h-10 rounded-full justify-center items-center cursor-pointer'>
-                          <Pencil
-                            className='size-4'
-                            onClick={() => handleEdit(transaction)}
-                          />
+                      {/* Validación de permisos para editar transacciones */}
+
+                      {isAdmin && (
+                        <div className='flex'>
+                          <div className='flex hover:bg-slate-200 w-10 h-10 rounded-full justify-center items-center'>
+                            {/* Button pencil edit  */}
+                            <div className='flex hover:bg-slate-200 w-10 h-10 rounded-full justify-center items-center cursor-pointer'>
+                              <Pencil
+                                className='size-4'
+                                onClick={() => handleEdit(transaction)}
+                              />
+                            </div>
+                            {/* Button pencil edit  */}
+                          </div>
+                          {/* Button trash delete */}
+                          <div className='flex hover:bg-red-300 w-10 h-10 rounded-full justify-center items-center cursor-pointer'>
+                            <Trash
+                              className='size-4 text-red-500'
+                              onClick={() => handleDelete(transaction.id)}
+                            >
+                              <Button className='h-4 w-4' />
+                              Eliminar
+                            </Trash>
+                          </div>
                         </div>
-                        {/* Button pencil edit  */}
-                      </div>
-                      {/* Button trash delete */}
-                      <div className='flex hover:bg-red-300 w-10 h-10 rounded-full justify-center items-center cursor-pointer'>
-                        <Trash
-                          className='size-4 text-red-500'
-                          onClick={() => handleDelete(transaction.id)}
-                        >
-                          <Button className='h-4 w-4' />
-                          Eliminar
-                        </Trash>
-                      </div>
+                      )}
+
                       {/* Button trash delete */}
                     </TableCell>
                   </TableRow>
