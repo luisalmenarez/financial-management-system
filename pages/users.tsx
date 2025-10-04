@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/router';
 import { ArrowLeft, Edit } from 'lucide-react';
+import { Loading } from '@/components/ui/loading';
 
 const Users = () => {
   const router = useRouter();
@@ -103,7 +104,7 @@ const Users = () => {
   if (loading) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
-        Cargando...
+        <Loading loading={loading} />
       </div>
     );
   }

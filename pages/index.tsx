@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/card';
 import { useRouter } from 'next/router';
 import { DollarSign, Users, BarChart3, LogOut, Menu, X } from 'lucide-react';
+import { Loading } from '@/components/ui/loading';
 
 const Home = () => {
   const router = useRouter();
@@ -38,7 +39,7 @@ const Home = () => {
   if (loading) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
-        <p>Cargando...</p>
+        <Loading loading={loading} />
       </div>
     );
   }

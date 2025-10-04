@@ -20,6 +20,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { Loading } from '@/components/ui/loading';
 
 const Reports = () => {
   const router = useRouter();
@@ -81,7 +82,7 @@ const Reports = () => {
   if (loading) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
-        Cargando...
+        <Loading loading={loading} />
       </div>
     );
   }
