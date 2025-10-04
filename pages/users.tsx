@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import { authClient } from '@/lib/auth/client';
 import { Button } from '@/components/ui/button';
@@ -21,7 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/router';
-import { Edit, Pencil, Trash } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { Loading } from '@/components/ui/loading';
 import { Layout } from '@/components/ui/layout';
 
@@ -67,6 +68,7 @@ const Users = () => {
       }
     } catch (error) {
       console.error('Error al obtener usuarios:', error);
+      toast.error('Error al obtener usuarios');
     } finally {
       setloadingTransactions(false);
     }
@@ -82,30 +84,6 @@ const Users = () => {
     setDialogOpen(true);
   };
 
-  const handleDelete = async (id = '') => {
-    if (!confirm('¿Está seguro que desea eliminar este usuario?')) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/users/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        alert('Usuario eliminado exitosamente');
-        fetchUsers();
-      } else {
-        const error = await response.json();
-        alert(error.error || 'Error al eliminar usuario');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al eliminar el usuario seleccionado.');
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -118,15 +96,16 @@ const Users = () => {
       });
 
       if (response.ok) {
+        toast.success('Usuario actualizado correctamente');
         setDialogOpen(false);
         fetchUsers();
       } else {
         const error = await response.json();
-        alert(error.error || 'Error al actualizar usuario');
+        toast.error(error.error || 'Error al actualizar usuario');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al actualizar usuario');
+      toast.error('Error al actualizar usuario');
     }
   };
 
@@ -186,13 +165,6 @@ const Users = () => {
                             size='sm'
                           >
                             <Pencil className='size-4' />
-                          </Button>
-                          <Button
-                            onClick={() => handleDelete(usr.id)}
-                            variant='delete'
-                            size='sm'
-                          >
-                            <Trash className='size-4 text-red-500' />
                           </Button>
                         </TableCell>
                       </TableRow>

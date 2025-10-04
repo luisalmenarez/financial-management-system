@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import { authClient } from '@/lib/auth/client';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/router';
 import { Plus, Pencil, Trash } from 'lucide-react';
 import { Layout } from '@/components/ui/layout';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 const Transactions = () => {
   const router = useRouter();
@@ -41,6 +43,10 @@ const Transactions = () => {
   });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<any>(null);
+  const [deleteDialog, setDeleteDialog] = useState({
+    open: false,
+    transactionId: '',
+  });
 
   useEffect(() => {
     const checkSession = async () => {
@@ -88,6 +94,7 @@ const Transactions = () => {
       });
 
       if (response.ok) {
+        toast.success('Transacción creada correctamente');
         setDialogOpen(false);
         setFormData({ concept: '', amount: '', date: '', type: 'INCOME' });
         fetchTransactions();
@@ -97,7 +104,7 @@ const Transactions = () => {
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al crear transacción');
+      toast.error('Error al crear transacción');
     }
   };
 
@@ -130,41 +137,46 @@ const Transactions = () => {
       );
 
       if (response.ok) {
+        toast.success('Transacción actualizada correctamente');
         setEditDialogOpen(false);
         setEditingTransaction(null);
         setFormData({ concept: '', amount: '', date: '', type: 'INCOME' });
         fetchTransactions();
       } else {
         const error = await response.json();
-        alert(error.error || 'Error al actualizar transacción');
+        toast.error(error.error || 'Error al actualizar transacción');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al actualizar transacción');
+      toast.error('Error al actualizar transacción');
     }
   };
 
-  const handleDelete = async (id = '') => {
-    if (!confirm('¿Está seguro que desea eliminar esta transacción?')) {
-      return;
-    }
+  const handleDeleteClick = (id: string) => {
+    setDeleteDialog({ open: true, transactionId: id });
+  };
 
+  const handleDeleteConfirm = async () => {
     try {
-      const response = await fetch(`/api/transactions/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `/api/transactions/${deleteDialog.transactionId}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+        }
+      );
 
       if (response.ok) {
-        alert('Transacción eliminada exitosamente');
+        toast.success('Transacción eliminada correctamente');
         fetchTransactions();
       } else {
         const error = await response.json();
-        alert(error.error || 'Error al eliminar transacción');
+        toast.error(error.error || 'Error al eliminar transacción');
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error al eliminar la transacción seleccionada.');
+      toast.error('Error al eliminar la transacción seleccionada.');
+    } finally {
+      setDeleteDialog({ open: false, transactionId: '' });
     }
   };
 
@@ -326,12 +338,25 @@ const Transactions = () => {
                             <Pencil className='size-4' />
                           </Button>
                           <Button
-                            onClick={() => handleDelete(transaction.id)}
+                            onClick={() => handleDeleteClick(transaction.id)}
                             size='sm'
                             variant='delete'
                           >
                             <Trash className='size-4 text-red-500' />
                           </Button>
+
+                          <ConfirmDialog
+                            open={deleteDialog.open}
+                            onOpenChange={(open) =>
+                              setDeleteDialog({ open, transactionId: '' })
+                            }
+                            onConfirm={handleDeleteConfirm}
+                            title='Eliminar transacción'
+                            description='¿Está seguro que desea eliminar esta transacción? Esta acción no se puede deshacer.'
+                            confirmText='Eliminar'
+                            cancelText='Cancelar'
+                            variant='destructive'
+                          />
                         </TableCell>
                       )}
                     </TableRow>
