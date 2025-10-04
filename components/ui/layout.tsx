@@ -163,7 +163,7 @@ export const Layout = ({
 
       {/* Main Content */}
       <main className='lg:ml-64 min-h-screen p-6 lg:p-10'>
-        <div className='mt-12 lg:mt-0'>
+        <div className='mt-12 lg:mt-0 max-w-[850px] mx-auto'>
           {title && (
             <h2 className='text-2xl font-bold text-gray-900 mb-6'>{title}</h2>
           )}
